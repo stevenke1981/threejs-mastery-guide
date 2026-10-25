@@ -1,0 +1,21 @@
+{
+  "name": "threejs-mastery-guide",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "description": "繁體中文 Three.js 分類指南與可互動學習範例",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "dependencies": {
+    "three": "0.186.1"
+  },
+  "devDependencies": {
+    "vite": "8.3.5"
+  },
+  "engines": {
+    "node": "^20.19.0 || >=22.12.0"
+  }
+}

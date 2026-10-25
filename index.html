@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#080d18" />
+    <meta name="description" content="Three.js 繁體中文分類指南與互動 3D 入門範例。" />
+    <title>Three.js Lab｜互動入門</title>
+  </head>
+  <body>
+    <main class="app-shell">
+      <header class="topbar">
+        <a class="brand" href="./" aria-label="Three.js Lab 首頁"><span class="brand-mark">3D</span><span>THREE.JS <b>LAB</b></span></a>
+        <nav aria-label="主要導覽"><a href="./docs/00-start-here.md">學習指南</a><a href="https://threejs.org/docs/" target="_blank" rel="noreferrer">官方 API</a><a href="https://github.com/stevenke1981/threejs-mastery-guide" target="_blank" rel="noreferrer">GitHub ↗</a></nav>
+      </header>
+      <section class="intro">
+        <p class="eyebrow">INTERACTIVE LEARNING SCENE</p>
+        <h1>把 3D，拆解成<br /><span>看得見的概念。</span></h1>
+        <p class="lede">旋轉檢視場景、點擊物件觀察 Raycaster 命中結果。再搭配下方控制台，理解 Scene、Camera、Light、Material 與 Renderer 如何協作。</p>
+      </section>
+      <section class="workspace" aria-label="Three.js 互動展示">
+        <div class="viewport" id="viewport">
+          <div class="viewport-label"><span class="live-dot"></span> REAL-TIME VIEWPORT <span class="viewport-hint">拖曳旋轉 · 滾輪縮放 · 點擊選取</span></div>
+          <div id="scene-root" aria-label="可互動的 3D 場景"></div>
+          <div class="selection-card"><span class="muted-label">SELECTED OBJECT</span><strong id="selection">點選一個物件</strong><span id="selection-detail">Raycaster 將回報命中的 Mesh</span></div>
+          <div class="scene-coords" aria-hidden="true">X <i></i> Y <i></i> Z</div>
+        </div>
+        <aside class="inspector">
+          <div class="panel-heading"><div><p class="eyebrow">SCENE INSPECTOR</p><h2>場景控制台</h2></div><span class="status-pill">LIVE</span></div>
+          <div class="control-group"><label for="rotation-speed">旋轉速度 <output id="speed-value">1.0×</output></label><input id="rotation-speed" type="range" min="0" max="2.5" step="0.1" value="1" /></div>
+          <label class="toggle-row"><span><b>物件線框</b><small>查看幾何表面網格</small></span><input id="wireframe-toggle" type="checkbox" /><span class="switch"></span></label>
+          <div class="divider"></div>
+          <p class="muted-label">RENDERER.INFO</p>
+          <div class="stats-grid"><div><span>Draw calls</span><strong id="draw-calls">—</strong></div><div><span>Triangles</span><strong id="triangles">—</strong></div><div><span>Geometries</span><strong id="geometries">—</strong></div><div><span>Textures</span><strong id="textures">—</strong></div></div>
+          <div class="hint-box"><span class="hint-icon">i</span><p><b>試著觀察</b><br />改變視角、切換線框，或點擊球體、方塊與圓環。每個畫面都由同一個 render loop 更新。</p></div>
+          <a class="guide-link" href="./docs/00-start-here.md">從指南開始閱讀 <span>→</span></a>
+        </aside>
+      </section>
+      <footer><span>THREE.JS LEARNING GUIDE</span><span>繁體中文整理 · 範例版本 r186</span></footer>
+    </main>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
