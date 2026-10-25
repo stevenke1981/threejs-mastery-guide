@@ -10,7 +10,15 @@ scene.background = new THREE.Color('#080d18');
 const camera = new THREE.PerspectiveCamera(42, 1, 0.1, 100);
 camera.position.set(5.4, 4.2, 8.2);
 
-const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+const rendererCanvas = document.createElement('canvas');
+let renderer;
+try {
+  renderer = new THREE.WebGLRenderer({ canvas: rendererCanvas, antialias: true, alpha: false });
+} catch (error) {
+  root.innerHTML = '<div class="unsupported" role="alert"><strong>無法啟動 3D 畫布</strong><br />此範例需要支援 WebGL 2 的瀏覽器與可用的圖形加速。請更新瀏覽器或檢查硬體加速設定。</div>';
+  console.error('Three.js WebGL 2 renderer initialization failed.', error);
+  throw error;
+}
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.05;
@@ -52,7 +60,6 @@ function addObject(name, geometry, material, position, detail) {
   mesh.name = name;
   mesh.position.set(...position);
   mesh.userData.detail = detail;
-  mesh.castShadow = true;
   scene.add(mesh);
   objects.push(mesh);
   return mesh;
@@ -68,6 +75,7 @@ const selection = document.querySelector('#selection');
 const selectionDetail = document.querySelector('#selection-detail');
 let selected = null;
 let rotationSpeed = 1;
+let pointerStart = null;
 
 function updateSelection(next) {
   if (selected) selected.scale.setScalar(1);
@@ -83,13 +91,27 @@ function updateSelection(next) {
 }
 
 renderer.domElement.addEventListener('pointerdown', (event) => {
+  if (event.button !== 0) return;
+  pointerStart = { x: event.clientX, y: event.clientY };
+});
+
+renderer.domElement.addEventListener('pointerup', (event) => {
+  if (!pointerStart) return;
+  const start = pointerStart;
+  pointerStart = null;
+  if (Math.hypot(event.clientX - start.x, event.clientY - start.y) > 5) return;
+
   const rect = renderer.domElement.getBoundingClientRect();
   pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
   pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+  scene.updateMatrixWorld(true);
+  camera.updateMatrixWorld();
   raycaster.setFromCamera(pointer, camera);
   const hit = raycaster.intersectObjects(objects, false)[0];
   updateSelection(hit?.object ?? null);
 });
+
+renderer.domElement.addEventListener('pointercancel', () => { pointerStart = null; });
 
 document.querySelector('#rotation-speed').addEventListener('input', (event) => {
   rotationSpeed = Number(event.target.value);
@@ -103,7 +125,10 @@ document.querySelector('#wireframe-toggle').addEventListener('change', (event) =
 function resize() {
   const cssWidth = Math.max(1, viewport.clientWidth);
   const cssHeight = Math.max(1, viewport.clientHeight);
-  const pixelRatio = Math.min(window.devicePixelRatio || 1, 2);
+  const dpr = window.devicePixelRatio || 1;
+  const maxPixelCount = 3840 * 2160;
+  const ratioForPixelBudget = Math.sqrt(maxPixelCount / (cssWidth * cssHeight));
+  const pixelRatio = Math.min(dpr, 2, ratioForPixelBudget);
   renderer.setSize(Math.floor(cssWidth * pixelRatio), Math.floor(cssHeight * pixelRatio), false);
   camera.aspect = cssWidth / cssHeight;
   camera.updateProjectionMatrix();
@@ -112,7 +137,17 @@ function resize() {
 const resizeObserver = new ResizeObserver(resize);
 resizeObserver.observe(viewport);
 resize();
+controls.update();
+renderer.render(scene, camera);
 
+function updateStats() {
+  document.querySelector('#draw-calls').textContent = renderer.info.render.calls;
+  document.querySelector('#triangles').textContent = renderer.info.render.triangles.toLocaleString();
+  document.querySelector('#geometries').textContent = renderer.info.memory.geometries;
+  document.querySelector('#textures').textContent = renderer.info.memory.textures;
+}
+
+updateStats();
 let previousTime = 0;
 let statsFrames = 0;
 renderer.setAnimationLoop((time) => {
@@ -126,15 +161,13 @@ renderer.setAnimationLoop((time) => {
   controls.update();
   renderer.render(scene, camera);
 
-  if (++statsFrames % 12 === 0) {
-    document.querySelector('#draw-calls').textContent = renderer.info.render.calls;
-    document.querySelector('#triangles').textContent = renderer.info.render.triangles.toLocaleString();
-    document.querySelector('#geometries').textContent = renderer.info.memory.geometries;
-    document.querySelector('#textures').textContent = renderer.info.memory.textures;
-  }
+  if (++statsFrames % 12 === 0) updateStats();
 });
 
-window.addEventListener('pagehide', () => {
+let cleanedUp = false;
+window.addEventListener('pagehide', (event) => {
+  if (event.persisted || cleanedUp) return;
+  cleanedUp = true;
   resizeObserver.disconnect();
   controls.dispose();
   const geometries = new Set();
@@ -148,4 +181,4 @@ window.addEventListener('pagehide', () => {
   geometries.forEach((geometry) => geometry.dispose());
   materials.forEach((material) => material.dispose());
   renderer.dispose();
-}, { once: true });
+});

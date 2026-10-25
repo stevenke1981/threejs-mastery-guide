@@ -2,7 +2,7 @@
 
 ## Camera
 
-`PerspectiveCamera(fov, aspect, near, far)` 模擬透視投影：`fov` 為垂直視野角度（度），`aspect` 通常是畫布寬/高；near/far 定義可見的深度區間。near 不宜設為 0；過大的 near/far 比例也可能讓深度精度變差。相機需朝向目標，常用 `camera.lookAt()` 或控制器管理視角。
+Three.js r163 起的 `WebGLRenderer` 需要 WebGL 2；本範例會在無法建立 renderer 時顯示提示。`PerspectiveCamera(fov, aspect, near, far)` 模擬透視投影：`fov` 為垂直視野角度（度），`aspect` 通常是畫布寬/高；near/far 定義可見的深度區間。near 不宜設為 0；過大的 near/far 比例也可能讓深度精度變差。相機需朝向目標，常用 `camera.lookAt()` 或控制器管理視角。
 
 ## Renderer 與逐幀繪製
 

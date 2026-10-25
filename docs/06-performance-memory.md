@@ -18,11 +18,15 @@
 
 Three.js 的 GPU 資源生命週期不等同於 JavaScript 物件被 GC 回收。當不再需要時，依資源類型呼叫 `geometry.dispose()`、`material.dispose()`、`texture.dispose()` 等；移除 Mesh 本身不會自動釋放所有相關 GPU 資源。共享資源要管理引用關係，不能第一個物件卸載時就把仍被其他物件使用的材質 dispose。
 
-載入器可能建立多個貼圖與材質；清理時遍歷模型樹並避免重複 dispose。後處理 render targets、controls、renderer、event listeners、ResizeObserver 也需要各自清理。建議把建置與 teardown 封裝在明確的生命週期函式。
+載入器可能建立多個貼圖與材質；清理時遍歷模型樹並避免重複 dispose。後處理 render targets、controls、renderer、event listeners、ResizeObserver 也需要各自清理。若透過 `pagehide` 清理，先檢查 `event.persisted`：頁面被放入 Back/Forward Cache 時不要 dispose，否則返回頁面可能恢復已釋放的 renderer。建議把建置與 teardown 封裝在明確的生命週期函式。
 
 ## 陰影與透明度成本
 
 陰影貼圖、透明混合、後處理、過高的 framebuffer 尺寸會增加 GPU 成本。先在目標裝置記錄基準，再一次改一個變數。多數效能瓶頸取決於場景、解析度與硬體，沒有單一設定適合所有裝置。
+
+### 效能與響應式尺寸
+
+高 DPI 會放大 drawing buffer 的像素量；範例同時將 DPR 限制為 2，並將緩衝區上限設為 3840×2160 像素。這是範例的保護值，不是所有裝置的最佳設定；應依目標硬體量測。
 
 ### 官方延伸閱讀
 - [Cleanup](https://threejs.org/manual/pages/cleanup.html)

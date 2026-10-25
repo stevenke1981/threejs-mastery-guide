@@ -6,7 +6,7 @@
 - **Geometry / BufferGeometry**：定義頂點、索引、法線、UV 等形狀資料。
 - **Material**：描述表面如何呈現；可能使用顏色、貼圖與光照參數。
 - **Camera**：定義視點、投影與視錐。
-- **Renderer**：把場景與相機輸出為畫面。
+- **Renderer**：把場景與相機輸出為畫面；目前 `WebGLRenderer` 需要 WebGL 2。
 - **Addon**：需從 `three/addons/...` 額外匯入的控制器、載入器或功能模組。
 - **glTF / GLB**：常用於傳輸 3D 場景與資產的格式；GLB 是二進位封裝形式之一。
 - **PBR**：Physically Based Rendering，以較一致的物理參數描述表面與光照互動。
